@@ -1,0 +1,13 @@
+
+This is a small client to communicate with the https://www.banhosts.com web api which is used to detect and prevent brute force password attacks on services.
+
+* Installing.
+
+	You will need a few extra packages that all major Linux distrubutions already have. This includes the typical auto tool and c++ compilers. You will also need to install libcurl-dev and libjsoncpp-dev in order to compile this from source.
+
+	./autogen.sh && make && sudo make install
+
+
+	
+
+
