@@ -57,10 +57,10 @@ void LogError(const char *fmt, ...) {
 static void print_help(FILE *fp, char *app) {
     fprintf(fp, "Usage: %s -s (ssh|smtp|pop3|etc..) [<options>] <ip address>\n", app);
     fprintf(fp, "\n");
-    fprintf(fp, " -d --deadline       Set deadline for when to exit (current: %u)", deadline);
-    fprintf(fp, " -e --exit-code      Set default exit code during failure / deadline (current: %d)", default_exitcode);
-    fprintf(fp, " -u --url            Set upstream url default: https://api.banhosts.com");
-    fprintf(fp, " -s --service        Service type to use");
+    fprintf(fp, " -d --deadline       Set deadline for when to exit (current: %u)\n", deadline);
+    fprintf(fp, " -e --exit-code      Set default exit code during failure / deadline (current: %d)\n", default_exitcode);
+    fprintf(fp, " -u --url            Set upstream url default: https://api.banhosts.com\n");
+    fprintf(fp, " -s --service        Service type to use\n");
     fprintf(fp, " -v --verbose        Enable debug messages\n");
     fprintf(fp, " -V --version        Print the current version\n");
     fprintf(fp, "\n");
@@ -73,7 +73,7 @@ static void sig_alarm(int num) {
 int main(int argc, char **argv) {
     std::string CheckURL = "https://api.banhosts.com/check";
     std::string Service = "";
-    const char *opts = "e:hu:s:vV";
+    const char *opts = "d:e:hu:s:vV";
     int longindex = 0;
     int c = 0;
     struct option loptions[] {
@@ -100,6 +100,7 @@ int main(int argc, char **argv) {
                 break;
             case 'h':
                 print_help(stdout, argv[0]);
+                exit(EXIT_SUCCESS);
                 break;
             case 's':
                 Service = optarg;
