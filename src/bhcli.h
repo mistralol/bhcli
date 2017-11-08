@@ -6,4 +6,4 @@ extern void LogError(const char *fmt, ...);
 extern bool debug;
 extern int default_exitcode;
 extern unsigned int deadline;
-
+extern bool logging;

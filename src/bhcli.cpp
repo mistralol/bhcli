@@ -20,45 +20,59 @@
 bool debug = false;
 int default_exitcode = 0;
 unsigned int deadline = 10;
+bool logging = false;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 void Debug(const char *fmt, ...) {
     if (!debug) {
         return;
     }
     va_list ap;
     va_start(ap, fmt);
-    int res = vfprintf(stdout, fmt, ap);
-    if (res < 0)
+    char *tmp = NULL;
+    if (vasprintf(&tmp, fmt, ap) < 0)
         abort();
-    fprintf(stdout, "\n");
+    if (logging)
+        syslog(LOG_DEBUG, "%s", tmp);
+    fprintf(stdout, "%s\n", tmp);
+    free(tmp);
     va_end(ap);
 }
 
 void Log(const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
-    int res = vfprintf(stdout, fmt, ap);
-    if (res < 0)
+    char *tmp = NULL;
+    if (vasprintf(&tmp, fmt, ap) < 0)
         abort();
-    fprintf(stdout, "\n");
+    if (logging)
+        syslog(LOG_INFO, "%s", tmp);
+    fprintf(stdout, "%s\n", tmp);
+    free(tmp);
     va_end(ap);
 }
 
 void LogError(const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
-    int res = vfprintf(stdout, fmt, ap);
-    if (res < 0)
+    char *tmp = NULL;
+    if (vasprintf(&tmp, fmt, ap) < 0)
         abort();
-    fprintf(stdout, "\n");
+    if (logging)
+        syslog(LOG_ERR, "%s", tmp);
+    fprintf(stdout, "%s\n", tmp);
+    free(tmp);
     va_end(ap);
 }
+#pragma GCC diagnostic pop
 
 static void print_help(FILE *fp, char *app) {
     fprintf(fp, "Usage: %s -s (ssh|smtp|pop3|etc..) [<options>] <ip address>\n", app);
     fprintf(fp, "\n");
     fprintf(fp, " -d --deadline       Set deadline for when to exit (current: %u)\n", deadline);
     fprintf(fp, " -e --exit-code      Set default exit code during failure / deadline (current: %d)\n", default_exitcode);
+    fprintf(fp, " -l --log            Turn on loggin to syslog\n");
     fprintf(fp, " -u --url            Set upstream url default: https://api.banhosts.com\n");
     fprintf(fp, " -s --service        Service type to use\n");
     fprintf(fp, " -v --verbose        Enable debug messages\n");
@@ -73,13 +87,15 @@ static void sig_alarm(int num) {
 int main(int argc, char **argv) {
     std::string CheckURL = "https://api.banhosts.com/check";
     std::string Service = "";
-    const char *opts = "d:e:hu:s:vV";
+    const char *opts = "d:e:hlu:s:vV";
     int longindex = 0;
     int c = 0;
+
     struct option loptions[] {
         {"help", 0, 0, 'h'},
         {"deadline", 1, 0, 'd'},
         {"exit-code", 1, 0, 'e'},
+        {"log", 0, 0, 'l'},
         {"url", 1, 0, 'u'},
         {"verbose", 0, 0, 'v'},
         {"version", 0, 0, 'V'},
@@ -101,6 +117,9 @@ int main(int argc, char **argv) {
             case 'h':
                 print_help(stdout, argv[0]);
                 exit(EXIT_SUCCESS);
+                break;
+            case 'l':
+                logging = true;
                 break;
             case 's':
                 Service = optarg;
@@ -176,15 +195,14 @@ int main(int argc, char **argv) {
 
     if (Response.isMember("Accept") && Response.isMember("Reason") &&
         Response["Accept"].isBool() && Response["Reason"].isString()) {
+        std::string Reason = Response["Reason"].asString();
+        bool Accept = Response["Accept"].asBool();
 
         Log("IP: %s Accepted: %s Reason: %s", IP.c_str(),
-            Response["Accept"].asBool() ? "Yes" : "No",
-            Response["Reason"].asString().c_str() );
-        
-        Response["Accept"].asBool() ?
-            exit(EXIT_SUCCESS) :
-            exit(EXIT_FAILURE);
+            Accept ? "Yes" : "No",
+            Reason.c_str() );
 
+        Accept ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE);
     } else {
         LogError("Failed to parse service response");
     }
