@@ -17,7 +17,7 @@ static size_t callback(void *contents, size_t size, size_t nmemb, std::string *s
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winline"
 int Rest::Post(const std::string &URL, const Json::Value &Request, Json::Value &Response) {
-    static const std::string Agent = std::string("bhcli/") + VERSION;
+    static const std::string Agent = std::string("bhcli/") + PACKAGE_VERSION;
     long ret = 500;
     CURL *curl = curl_easy_init();
     if (!curl) {

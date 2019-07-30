@@ -1,14 +1,5 @@
-Makefile
-*.in
-*.m4
+m4
 *.o
-autom4te.cache/
-config.log
-config.status
-config/
-configure
-libtool
-m4/
-.deps
-src/bhcli
 .vscode
+build
+build-*

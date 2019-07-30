@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
                 Debug("Debug messages enabled");
                 break;
             case 'V':
-                printf("Version: %s\n", VERSION);
+                printf("Version: %s\n", PACKAGE_VERSION);
                 exit(EXIT_SUCCESS);
             default:
                 exit(EXIT_FAILURE);
