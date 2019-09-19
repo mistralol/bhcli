@@ -33,9 +33,11 @@ void Debug(const char *fmt, ...) {
     char *tmp = NULL;
     if (vasprintf(&tmp, fmt, ap) < 0)
         abort();
-    if (logging)
+    if (logging) {
         syslog(LOG_DEBUG, "%s", tmp);
-    fprintf(stdout, "%s\n", tmp);
+    } else {
+	fprintf(stdout, "%s\n", tmp);
+    }
     free(tmp);
     va_end(ap);
 }
@@ -46,9 +48,11 @@ void Log(const char *fmt, ...) {
     char *tmp = NULL;
     if (vasprintf(&tmp, fmt, ap) < 0)
         abort();
-    if (logging)
+    if (logging) {
         syslog(LOG_INFO, "%s", tmp);
-    fprintf(stdout, "%s\n", tmp);
+    } else {
+        fprintf(stdout, "%s\n", tmp);
+    }
     free(tmp);
     va_end(ap);
 }
@@ -59,9 +63,11 @@ void LogError(const char *fmt, ...) {
     char *tmp = NULL;
     if (vasprintf(&tmp, fmt, ap) < 0)
         abort();
-    if (logging)
+    if (logging) {
         syslog(LOG_ERR, "%s", tmp);
-    fprintf(stdout, "%s\n", tmp);
+    } else {
+        fprintf(stdout, "%s\n", tmp);
+    }
     free(tmp);
     va_end(ap);
 }
