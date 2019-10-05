@@ -18,7 +18,7 @@
 #include "Rest.h"
 
 bool debug = false;
-int default_exitcode = 0;
+int default_exitcode = 1;
 unsigned int deadline = 10;
 bool logging = false;
 
@@ -208,7 +208,11 @@ int main(int argc, char **argv) {
             Accept ? "Yes" : "No",
             Reason.c_str() );
 
-        Accept ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE);
+	if (Accept) {
+		exit(1);
+	} else {
+		exit(0);
+	}
     } else {
         LogError("Failed to parse service response");
     }
